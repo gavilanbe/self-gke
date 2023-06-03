@@ -4,20 +4,35 @@ provider "google" {
   region      = "<YOUR REGION>"
 }
 
-resource "google_compute_instance" "default" {
-  name         = "test"
-  machine_type = "n1-standard-1"
-  zone         = "<YOUR ZONE>"
+#K8s Master
 
-  boot_disk {
-    initialize_params {
-      image = "debian-cloud/debian-9"
-    }
+resource "google_compute_instance_template" "k8s-master" {
+  name_prefix  = "k8s-master-template-"
+  machine_type = "n1-standard-1"
+  region       = "<YOUR_REGION>"
+
+  disk {
+    source_image = "debian-cloud/debian-9"
+    auto_delete  = true
+    boot         = true
   }
 
   network_interface {
     network = "default"
-    access_config {
-    }
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_instance_group_manager" "k8s-master" {
+  name        = "k8s-master"
+  base_instance_name = "k8s-master"
+  zone        = "<YOUR_ZONE>"
+  version {
+    instance_template = google_compute_instance_template.k8s-master.id
+  }
+
+  target_size = 1
 }
