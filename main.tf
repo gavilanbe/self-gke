@@ -4,7 +4,7 @@ provider "google" {
   region      = "<YOUR REGION>"
 }
 
-#K8s Master
+# K8s MASTER
 
 resource "google_compute_instance_template" "k8s-master" {
   name_prefix  = "k8s-master-template-"
@@ -38,7 +38,7 @@ resource "google_compute_instance_group_manager" "k8s-master" {
 }
 
 
-#K8s Worker
+# K8s WORKER
 
 resource "google_compute_instance_template" "k8s-worker" {
   name_prefix  = "k8s-worker-template-"
