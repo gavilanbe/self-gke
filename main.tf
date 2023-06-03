@@ -36,3 +36,37 @@ resource "google_compute_instance_group_manager" "k8s-master" {
 
   target_size = 1
 }
+
+
+#K8s Worker
+
+resource "google_compute_instance_template" "k8s-worker" {
+  name_prefix  = "k8s-worker-template-"
+  machine_type = "n1-standard-1"
+  region       = "<YOUR_REGION>"
+
+  disk {
+    source_image = "debian-cloud/debian-9"
+    auto_delete  = true
+    boot         = true
+  }
+
+  network_interface {
+    network = "default"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_instance_group_manager" "k8s-worker" {
+  name        = "k8s-worker"
+  base_instance_name = "k8s-worker"
+  zone        = "<YOUR_ZONE>"
+  version {
+    instance_template = google_compute_instance_template.k8s-worker.id
+  }
+
+  target_size = 3
+}
